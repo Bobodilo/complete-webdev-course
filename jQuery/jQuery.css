@@ -1,0 +1,17 @@
+body::before {
+	display: block;
+	content: "";
+	height: 60px;
+}
+
+#map {
+	width: 50%;
+	height: 50%;
+	border-radius: 10%;
+}
+
+@media (min-width: 768px) {
+	.input-group {
+		width: 50%;
+	}
+}

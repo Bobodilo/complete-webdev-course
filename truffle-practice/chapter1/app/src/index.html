@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truffle-Mini Dapp</title>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css" />
+<script>
+        import { default as Web3 } from 'web3'; //connect with ETh blockchain
+            import { default as contract } from 'truffle-contract'; //Eth contract abstraction for the browser to allow Smart contracts with JS methods
+            import taskMasterArtifacts from '../../build/contracts/TaskMaster.json'; //JSON represation of the contract
+
+            var TaskMaster = contract(taskMasterArtifacts); // Get JS abstraction
+            var ownerAccount;
+
+            window.addEventListener('load', function () {
+                window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545")); // on load let us interact with the blockchainvia this host
+                TaskMasterApp.setWeb3Provider(); //set provider
+                TaskMasterApp.getAccounts(); // get all accounts
+
+            });
+
+            window.TaskMasterApp = {
+                setWeb3Provider: function () {
+                    TaskMaster.setProvider(web3.currentProvider);
+                },
+
+                refreshAccountBalance: function () {
+                    var self = this;
+                    TaskMaster.deployed()
+                        .then(function (taskMasterInstance) {
+                            return taskMasterInstance.getBalance.call(ownerAccount, {
+                                from: ownerAccount
+                            });
+                        }).then(function (value) {
+                            document.getElementById("accountBalance").innerHTML =
+                                value.valueOf();
+                            document.getElementById("accountBalance").style.color =
+                                "white";
+                        }).catch(function (e) {
+                            console.log(e);
+                        });
+                },
+
+                getAccounts: function () {  // Get accounts from web3 and set ownerAccount to oth addr
+                    var self = this;
+                    web3.eth.getAccounts(function (error, accounts) {
+                        if (error != null) {
+                            alert("Sorry, something went wrong. We couldn't fetch your accounts.");
+                            return;
+                        }
+                        if (!accounts.length) {
+                            alert("Sorry, no errors, but we couldn't get any accounts - Make sure your Ethereum client is configured correctly.");
+                            return;
+                        }
+                        ownerAccount = accounts[0];
+                        self.refreshAccountBalance();
+                    })
+                },
+
+            };
+
+</script>
+</head>
+<body Class="sans-serif pa4">
+    <div class="absolute right-1 top-1 tc pt4 left f5 pb3 bg-black-80 w4
+    h4 shadow-2 br4 white">You have
+        <div class="f3 mt3">
+            <span id="accountBalance" class="b"></span>
+            TodoCoin
+        </div>
+    </div>
+
+    <div class="tc f2 mt6 near-black">Reward a doer for their hard work - send them
+        TodoCoin</div>
+    <div class="pa4 mt4 bg-white shadow-1 br2 tc mw7 center">
+        <div class="f3 dark-green">Send TodoCoin</div>
+        <form class="pt3 pb4 ph5-l black-60">
+            <fieldset class="ba b--transparent ph0 mh0">
+                <div class="mt3 ph3 pa0-l">
+                    <input class="pa3 input-reset ba b--black-30 br2 bg-white-smoke w100" type="number" id="todoCoinReward"
+                        placeholder="Amount in TodoCoin">
+                </div>
+                <div class="mt3 ph3 pa0-l">
+                    <input class="pa3 input-reset ba b--black-30 br2 bg-white-smoke w100" type="text" id="doer"
+                        placeholder="Address">
+                </div>
+            </fieldset>
+        </form>
+        <button class="white pa3 ph4 bg-green br2 f3 b pointer">→
+        </button>
+    </div>
+    <div id="transactionStatus" class="pt4"></div>
+</body>
+</html>
+

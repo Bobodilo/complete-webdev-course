@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "cli": "^1.0.1",
+    "ganache": "^6.4.5"
+  }
+}
